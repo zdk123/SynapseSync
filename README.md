@@ -65,7 +65,7 @@ syn.create_from_project_tree(dtree)
 Now you should have an iris "subproject" and all subdirectories synced.
 
 Before finalizing the file "upload", we will establish file
-provenance relationships This is based on the prov python package, which supports a wider array of relationships than Synapse, but both are based on the W3C PROV data model.
+provenance relationships This is based on the `prov` python package. This supports a wider array of relationships than Synapse, but both are based on the W3C PROV data model.
 
 ```py
 from synapsesync import ProvProject
@@ -109,3 +109,22 @@ syn.store_files({"iris": iris})
 ```
 
 The example synapse project can be seen here: https://www.synapse.org/#!Synapse:syn21306223/files
+
+
+# Syncing from Synapse #
+
+This package contains a customized request Session class for pulling
+down synapse data hosted on Google drive.
+
+This is needed even for public Google drive links,
+since Google redirects pages to confirm that a user wants to download large files. See this [stackoverflow answer](https://stackoverflow.com/questions/25010369/wget-curl-large-file-from-google-drive/39225039#39225039) for details.
+
+```py
+from synapsesync import SynpaseProject, GDriveSession
+from synapseutils.sync import syncFromSynapse
+
+syn = SynpaseProject("ExampleProject")
+syn.set_session(GDriveSession())
+
+syncFromSynapse(syn, "syn21306223", path="./ExampleProject")
+```

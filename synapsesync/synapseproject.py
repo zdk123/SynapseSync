@@ -3,11 +3,12 @@ from treelib import Node, Tree, exceptions as texp
 from synapseclient import Synapse, Entity, Project, Folder, File, Link
 from synapseclient import Activity
 from synapseclient.exceptions import SynapseHTTPError
-from typing import Set, List, Dict, Tuple, Sequence, Union
-import re, os
+from typing import Set, List, Dict, Tuple, Sequence, Union, Type
+from requests import Session
 from .gdriveproject import GDriveTree, GDriveProject
 from .gdrivesession import GDriveSession
 from .projectprov import *
+import re, os
 
 
 class SynpaseProject(Synapse):
@@ -33,6 +34,23 @@ class SynpaseProject(Synapse):
     def create_file(self, *args, **kwargs) -> File:
         ## Don't store files until acitity relationships can be determined
         return File(*args, **kwargs)
+
+    def set_session(self, session: Type[Session]):
+        ## Overwrite default request Session
+        self._requests_session = session
+
+    # def get(self, entity, rename: bool = True, **kwargs):
+    #     out = super().get(entity, **kwargs)
+    #     try:
+    #         assert length(out.files) == 1
+    #         ## google drive links != file name on synapse
+    #         src = os.path.join(out.cacheDir, out.files[0])
+    #         dst = os.path.join(out.cacheDir, out.name)
+    #         os.rename(src, dst)
+    #         out.files[0] = out.name
+    #     except AssertionError:
+    #         pass
+    #     return out
 
     def get_activity(self, entity: Entity, version=None) -> Activity:
         try:
@@ -62,8 +80,13 @@ class SynpaseProject(Synapse):
 
         for child in children:
             if child.is_file():
+                ## attach fake file name to end of externalURL: hacky way to get around
+                ## that synapse uses a url split to determine the name to "download file as"
+                ##`` https://github.com/Sage-Bionetworks/synapsePythonClient/blob/9d618c3015c380ebf5098fc706f0c022b685ccc8/synapseclient/client.py#L1901
+                ## TODO: raise this as an issue.
                 file = self.create_file(
-                    path=child.gdrivefile["webContentLink"],
+                    externalURL=child.gdrivefile["webContentLink"] + "&/" + child.tag,
+                    path=child.tag,
                     name=child.tag,
                     parent=n.data.id,
                     synapseStore=False,

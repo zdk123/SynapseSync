@@ -30,6 +30,7 @@ setup(
         "requests",
         "prov",
         "typing",
+        "pydot",
     ],  # Optional
     # project_urls={  # Optional
     #     "Bug Reports": "https://github.com/zdk123/SynapseSync/issues",
