@@ -22,6 +22,8 @@ class ProvProject(ProvDocument):
         self.add_namespace("map", "map")
         self.add_namespace("biom", "biom")
         self.add_namespace("txt", "txt")
+        self.add_namespace("yml", "yml")
+        self.add_namespace("pdf", "pdf")
 
         self.home_dir = os.path.realpath(homedir)
 
