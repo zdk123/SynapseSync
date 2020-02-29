@@ -123,8 +123,16 @@ since Google redirects pages to confirm that a user wants to download large file
 from synapsesync import SynpaseProject, GDriveSession
 from synapseutils.sync import syncFromSynapse
 
+## If credentials are stored at ~/.synapseConfig
 syn = SynpaseProject("ExampleProject")
-syn.set_session(GDriveSession())
 
+## OR ##
+## email/password login:
+syn = SynpaseProject()
+syn.login("<user>", "<pass>")
+syn.set_project("ExampleProject")
+
+## Continue:
+syn.set_session(GDriveSession())
 syncFromSynapse(syn, "syn21306223", path="./ExampleProject")
 ```

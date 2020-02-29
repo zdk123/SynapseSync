@@ -17,15 +17,20 @@ class SynpaseProject(Synapse):
     Contains methods for syncing file and provenence data between systems.
     """
 
-    def __init__(self, project: str, *args, **kwargs):
+    def __init__(self, project: str = None, *args, **kwargs):
         # Set up synapse client
         super().__init__(*args, **kwargs)
 
         try:
-            self.login()
+            self.login(*args, **kwargs)
         except Exception as e:
             print("Couldn't login using default credentials file")
+        try:
+            self.set_project(project)
+        except Exception as e:
+            print("Login to set project")
 
+    def set_project(self, project: str):
         self.project = self.store(Project(project))
 
     def create_folder(self, *args, **kwargs) -> Folder:
